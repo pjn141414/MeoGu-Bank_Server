@@ -22,6 +22,7 @@ export default class Send {
   @Column({ name: 'pay' })
   pay!: number;
 
+
   @CreateDateColumn({ name: 'create_at' })
   createAt!: Date;
 }

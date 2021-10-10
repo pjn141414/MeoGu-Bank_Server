@@ -7,7 +7,7 @@ export default class EasyPassword {
   idx!: number;
 
   @Column({ name: 'easy_password' })
-  easyPassword!: number;
+  easyPassword!: string;
 
   @RelationId((user: User) => user.id)
   userId!: string;

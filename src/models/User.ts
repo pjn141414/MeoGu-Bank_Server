@@ -10,6 +10,7 @@ import EasyPassword from "./easyPassword";
 
 @Entity('user')
 export default class User {
+
   @PrimaryColumn({ name: 'id' })
   id!: string;
 

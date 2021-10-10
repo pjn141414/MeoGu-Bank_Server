@@ -12,7 +12,7 @@ export default class Account {
   name!: string;
 
   @Column({ name: 'password' })
-  password!: number;
+  password!: string;
 
   @RelationId((account: Account) => account.accountNum)
   userId!: string;
