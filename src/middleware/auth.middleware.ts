@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext } from "@nestjs/common";
-import HttpError from "src/lib/httpError";
+import HttpError from "src/lib/error/httpError";
 import User from "src/models/User";
 import * as tokenLib from "src/lib/tokenLib";
 
