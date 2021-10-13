@@ -1,9 +1,9 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from "typeorm";
 import User from "./User";
 
 @Entity('easy_password')
 export default class EasyPassword {
-  @PrimaryGeneratedColumn({ name: 'idx' })
+  @PrimaryColumn({ name: 'idx' })
   idx!: number;
 
   @Column({ name: 'easy_password' })

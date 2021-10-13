@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext } from "@nestjs/common";
 import HttpError from "src/lib/error/httpError";
 import User from "src/models/User";
-import * as tokenLib from "src/lib/tokenLib";
+import * as tokenLib from "src/lib/token/tokenLib";
 
 export default class AuthGuard implements CanActivate {
   public canActivate(context: ExecutionContext): boolean {

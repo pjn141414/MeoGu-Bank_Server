@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export default class SignUpDto {
   @IsNotEmpty()
@@ -13,10 +19,10 @@ export default class SignUpDto {
 
   @IsNotEmpty()
   @MinLength(8, {
-    message: '비밀번호는 8자리부터 12자리까지만 가능합니다.'
+    message: '비밀번호는 8자리부터 12자리까지만 가능합니다.',
   })
   @MaxLength(12, {
-    message: '비밀번호는 8자리부터 12자리까지만 가능합니다.'
+    message: '비밀번호는 8자리부터 12자리까지만 가능합니다.',
   })
   @IsString()
   password!: string;

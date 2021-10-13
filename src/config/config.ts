@@ -11,5 +11,5 @@ export const dbConfig = {
 }
 
 export const ENDPOINT = {
-  SERVER: "http://192.168.0.37:8080",
+  SERVER: "localhost",
 }
