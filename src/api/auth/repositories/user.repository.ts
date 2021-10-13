@@ -3,26 +3,32 @@ import { EntityRepository, Repository } from "typeorm";
 
 @EntityRepository(User)
 export default class userRepository extends Repository<User> {
+  public getUsers(): Promise<User[]> {
+    return this.createQueryBuilder()
+      .orderBy('id', 'DESC')
+      .getMany()
+  }
+
   public existCheckId(id: string): Promise<User | undefined> {
     return this.createQueryBuilder()
       .where('id =: id', { id })
       .getOne()
   }
 
-  public existChckPassword(password: string): Promise<User | undefined> {
+  public getUserById(id: string): Promise<User | undefined> {
     return this.createQueryBuilder()
-      .where('password =: password', { password })
+      .where('id =: id', { id })
       .getOne();
   }
 
-  public findUserByIdAndPassword(id: string, password: string): Promise<User | undefined> {
+  public getUserByIdAndPassword(id: string, password: string): Promise<User | undefined> {
     return this.createQueryBuilder()
       .where('id =: id', { id })
       .andWhere('password =: password', { password })
       .getOne()
   }
 
-  public findUserByPhone(phone: string): Promise<User | undefined> {
+  public getUserByPhone(phone: string): Promise<User | undefined> {
     return this.createQueryBuilder()
       .where('phone =: phone', { phone })
       .getOne()
