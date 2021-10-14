@@ -15,6 +15,12 @@ export default class EasyPasswordRepository extends Repository<EasyPassword> {
       .getOne();
   }
 
+  public getUserByIdx(idx: string): Promise<EasyPassword | undefined> {
+    return this.createQueryBuilder()
+      .where('idx= : idx', { idx })
+      .getOne();
+  }
+
   public getUserByIdAndEasyPassword(userId: string, easyPassword: string): Promise<EasyPassword | undefined> {
     return this.createQueryBuilder()
       .leftJoinAndSelect('easyPassword.userId', 'userId')
@@ -23,7 +29,7 @@ export default class EasyPasswordRepository extends Repository<EasyPassword> {
       .getOne();
   }
 
-  public getUserByIdxAndEasyPassword(idx: number, easyPassword: string): Promise<EasyPassword | undefined> {
+  public getUserByIdxAndEasyPassword(idx: string, easyPassword: string): Promise<EasyPassword | undefined> {
     return this.createQueryBuilder()
       .where('idx =: idx', { idx })
       .andWhere('easyPassword =: easyPassword', { easyPassword })

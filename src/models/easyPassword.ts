@@ -4,7 +4,7 @@ import User from "./User";
 @Entity('easy_password')
 export default class EasyPassword {
   @PrimaryColumn({ name: 'idx' })
-  idx!: number;
+  idx!: string;
 
   @Column({ name: 'easy_password' })
   easyPassword!: string;

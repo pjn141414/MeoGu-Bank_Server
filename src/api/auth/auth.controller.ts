@@ -4,6 +4,10 @@ import { AuthService } from './auth.service';
 import SignUpDto from './dto/signUpDto';
 import * as tokenLib from 'src/lib/token/tokenLib';
 import SignInDto from './dto/signInDto';
+import { ILogin } from 'src/interfaces/login.interface';
+import EasyLoginSignUpDto from './dto/easyLoginSignUpDto';
+import EasyPassword from 'src/models/easyPassword';
+import EasyLoginDto from './dto/easyLoginDto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,7 +32,7 @@ export class AuthController {
 
   @Get('/signup/check/:easyPassword')
   @HttpCode(200)
-  async existCheckEasyPw(@Query() signUpDto: SignUpDto) {
+  async checkPwForm(@Query() signUpDto: SignUpDto) {
     const { password }: { password: string } = signUpDto;
     const easyPassword: boolean = await this.authService.checkPwForm(password);
 
@@ -55,15 +59,33 @@ export class AuthController {
   @Post('/signin')
   @HttpCode(200)
   async signIn(@Body() signInDto: SignInDto) {
-    const user: User = await this.authService.signIn(signInDto);
-    const token: string = tokenLib.generateToken(user.id);
+    await this.authService.signIn(signInDto);
 
     return {
       status: 200,
       message: '로그인 성공',
-      data: {
-        token,
-      },
+    };
+  }
+
+  @Post('/signup/easy')
+  @HttpCode(200)
+  async easyLoginSignUp(@Body() easyLoginSignUpDto: EasyLoginSignUpDto) {
+    await this.authService.easyLoginSignUp(easyLoginSignUpDto);
+
+    return {
+      status: 200,
+      message: '간편 비밀번호 생성 성공',
+    };
+  }
+
+  @Post('/signin/easy')
+  @HttpCode(200)
+  async easyLogin(@Body() easyLoginDto: EasyLoginDto) {
+    await this.authService.easyLogin(easyLoginDto);
+
+    return {
+      status: 200,
+      message: '간편 로그인 성공',
     };
   }
 }

@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, Max, Min } from "class-validator";
 export default class EasyLoginDto {
   @IsNotEmpty()
   @IsString()
-  idx!: number;
+  idx!: string;
 
   @IsNotEmpty()
   @Min(6, {
