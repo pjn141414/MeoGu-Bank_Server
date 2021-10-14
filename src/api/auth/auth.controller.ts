@@ -15,10 +15,9 @@ export class AuthController {
     private readonly authService: AuthService,
   ) { }
 
-  @Get('/signup/check/:id')
+  @Get('/signup/check')
   @HttpCode(200)
-  async existCheckId(@Query() signUpDto: SignUpDto) {
-    const { id }: { id: string } = signUpDto;
+  async existCheckId(@Query('id') id: string) {
     const user: boolean = await this.authService.existIdCheck(id);
 
     return {
@@ -30,10 +29,9 @@ export class AuthController {
     };
   }
 
-  @Get('/signup/check/:easyPassword')
+  @Get('/signup/check')
   @HttpCode(200)
-  async checkPwForm(@Query() signUpDto: SignUpDto) {
-    const { password }: { password: string } = signUpDto;
+  async checkPwForm(@Query('password') password: string) {
     const easyPassword: boolean = await this.authService.checkPwForm(password);
 
     return {
