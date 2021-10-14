@@ -90,13 +90,9 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto): Promise<void> {
     const { phone }: { id: string, phone: string } = signUpDto;
 
-    const regex = /^\d{3}-\d{3,4}-\d{4}$/;
     const user: User | undefined = await this.userRepository.getUserByPhone(phone);
     if (user !== undefined) {
       throw new ConflictException('이미 해당 전화번호로 가입한 유저가 있습니다.');
-    }
-    if (regex.test(user.phone)) {
-      throw new BadRequestException('전화번호 양식에 맞지 않습니다.');
     }
 
     await this.userRepository.save(signUpDto);
