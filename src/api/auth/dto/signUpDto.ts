@@ -32,6 +32,9 @@ export default class SignUpDto {
   phone!: string;
 
   @IsNotEmpty()
+  @Length(7, 7, {
+    message: '생년월일은 주민등록번호의 앞자리 + 뒷 한 자리, 총 7자리만 가능합니다.',
+  })
   @IsString()
   birth!: string;
 }
