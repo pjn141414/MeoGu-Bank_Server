@@ -8,9 +8,10 @@ import CatchException from './lib/error/catchException';
 import { AuthModule } from './api/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'src/config/ormConfig';
+import { AccountModule } from './api/account/account.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config), AuthModule],
+  imports: [TypeOrmModule.forRoot(config), AuthModule, AccountModule],
   controllers: [AppController, UploadController],
   providers: [AppService, {
     provide: APP_FILTER,
