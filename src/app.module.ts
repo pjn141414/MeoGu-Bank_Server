@@ -5,9 +5,12 @@ import { AppService } from './app.service';
 import { UploadService } from './api/upload/upload.service';
 import { UploadController } from './api/upload/upload.controller';
 import CatchException from './lib/error/catchException';
+import { AuthModule } from './api/auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { config } from 'src/config/ormConfig';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forRoot(config), AuthModule],
   controllers: [AppController, UploadController],
   providers: [AppService, {
     provide: APP_FILTER,
