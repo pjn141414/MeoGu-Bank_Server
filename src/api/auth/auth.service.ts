@@ -6,7 +6,7 @@ import EasyLoginDto from './dto/easyLoginDto';
 import EasyLoginSignUpDto from './dto/easyLoginSignUpDto';
 import SignUpDto from './dto/signUpDto';
 import EasyPasswordRepository from './repositories/easyPassword.repository';
-import userRepository from './repositories/user.repository';
+import UserRepository from './repositories/user.repository';
 import { v4 as uuidv4 } from 'uuid';
 import SignInDto from './dto/signInDto';
 import { ILogin } from 'src/interfaces/login.interface';
@@ -15,7 +15,7 @@ import IEasyLogin from 'src/interfaces/easyLogin.interface';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: userRepository,
+    private readonly userRepository: UserRepository,
     private readonly easyPasswordRepository: EasyPasswordRepository,
   ) { }
 
