@@ -20,9 +20,7 @@ export class AccountService {
   /**
    * @description 특정 계좌 조회
    */
-  // async getAccount(): Promise<Account | undefined> {
-
-}
+  // async getAccount(): Promise<Account | undefined> { }
 
   /**
    * @description 계좌 개설
