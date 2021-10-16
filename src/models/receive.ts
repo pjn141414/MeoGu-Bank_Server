@@ -9,7 +9,7 @@ export default class Receive {
   @Column({ name: 'sender_id' })
   senderId!: string;
 
-  @RelationId((account: Account) => account.accountNum)
+  @RelationId((receive: Receive) => receive.account)
   accountNum!: string;
 
   @JoinColumn({ name: 'fk_account_num' })

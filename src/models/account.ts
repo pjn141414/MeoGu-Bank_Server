@@ -14,7 +14,7 @@ export default class Account {
   @Column({ name: 'password' })
   password!: string;
 
-  @RelationId((account: Account) => account.accountNum)
+  @RelationId((account: Account) => account.user)
   userId!: string;
 
   @JoinColumn({ name: 'fk_user_id' })

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, RelationId } from "typeorm";
 import User from "./User";
 
 @Entity('easy_password')
@@ -9,7 +9,7 @@ export default class EasyPassword {
   @Column({ name: 'easy_password' })
   easyPassword!: string;
 
-  @RelationId((user: User) => user.id)
+  @RelationId((easyPassword: EasyPassword) => easyPassword.user)
   userId!: string;
 
   @JoinColumn({ name: 'fk_user_id' })
