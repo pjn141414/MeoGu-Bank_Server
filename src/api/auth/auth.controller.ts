@@ -1,12 +1,8 @@
 import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
-import User from 'src/models/User';
 import { AuthService } from './auth.service';
 import SignUpDto from './dto/signUpDto';
-import * as tokenLib from 'src/lib/token/tokenLib';
 import SignInDto from './dto/signInDto';
-import { ILogin } from 'src/interfaces/login.interface';
 import EasyLoginSignUpDto from './dto/easyLoginSignUpDto';
-import EasyPassword from 'src/models/easyPassword';
 import EasyLoginDto from './dto/easyLoginDto';
 
 @Controller('auth')
@@ -29,40 +25,38 @@ export class AuthController {
     };
   }
 
-  @Get('/signup/check')
-  @HttpCode(200)
-  async checkPwForm(@Query('password') password: string) {
-    const easyPassword: boolean = await this.authService.checkPwForm(password);
-
-    return {
-      status: 200,
-      message: '비밀번호 양식 체크 성공',
-      data: {
-        easyPassword,
-      }
-    };
-  }
-
   @Post('/signup')
   @HttpCode(200)
   async signUp(@Body() signUpDto: SignUpDto) {
-    await this.authService.signUp(signUpDto);
+    try {
+      await this.authService.signUp(signUpDto);
 
-    return {
-      status: 200,
-      message: '일반 회원가입 성공',
-    };
+      return {
+        status: 200,
+        message: '일반 회원가입 성공',
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post('/signin')
   @HttpCode(200)
   async signIn(@Body() signInDto: SignInDto) {
-    await this.authService.signIn(signInDto);
+    try {
+      const user = await this.authService.signIn(signInDto);
 
-    return {
-      status: 200,
-      message: '로그인 성공',
-    };
+
+      return {
+        status: 200,
+        message: '로그인 성공',
+        data: {
+          user,
+        }
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post('/signup/easy')
@@ -79,11 +73,14 @@ export class AuthController {
   @Post('/signin/easy')
   @HttpCode(200)
   async easyLogin(@Body() easyLoginDto: EasyLoginDto) {
-    await this.authService.easyLogin(easyLoginDto);
+    const easyLogin = await this.authService.easyLogin(easyLoginDto);
 
     return {
       status: 200,
       message: '간편 로그인 성공',
+      data: {
+        easyLogin,
+      }
     };
   }
 }

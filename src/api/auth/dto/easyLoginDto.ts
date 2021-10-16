@@ -1,17 +1,13 @@
-import { IsNotEmpty, IsString, Max, Min } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID, Length } from "class-validator";
 
 export default class EasyLoginDto {
   @IsNotEmpty()
   @IsString()
+  @IsUUID('4')
   idx!: string;
 
   @IsNotEmpty()
-  @Min(6, {
-    message: '간편 비밀번호는 6자리만 가능합니다.',
-  })
-  @Max(6, {
-    message: '간편 비밀번호는 6자리만 가능합니다',
-  })
+  @Length(6)
   @IsString()
   easyPassword!: string;
 }
