@@ -24,7 +24,10 @@ export default class Account {
   })
   user!: User;
 
-  @Column({ name: 'pay' })
+  @Column({
+    name: 'pay',
+    default: 10000,
+  })
   pay!: number;
 
   @ManyToMany(type => Send, send => send.account)
