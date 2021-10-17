@@ -7,7 +7,7 @@ export default class AuthGuard implements CanActivate {
   public canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
 
-    const token = request.headers['authorization'];
+    const token = request.headers['meogu-token'];
 
     if (token === undefined) {
       throw new HttpError(401, "토큰 전송에 실패했습니다");
