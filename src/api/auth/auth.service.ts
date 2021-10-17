@@ -6,7 +6,7 @@ import EasyLoginDto from './dto/easyLoginDto';
 import EasyLoginSignUpDto from './dto/easyLoginSignUpDto';
 import SignUpDto from './dto/signUpDto';
 import EasyPasswordRepository from './repositories/easyPassword.repository';
-import UserRepository from './repositories/user.repository';
+import UserRepository from '../user/repositories/user.repository';
 import { v4 as uuidv4 } from 'uuid';
 import SignInDto from './dto/signInDto';
 import { ILogin } from 'src/interfaces/login.interface';
