@@ -5,7 +5,14 @@ import { EntityRepository, Repository } from "typeorm";
 export default class AccountRepository extends Repository<Account> {
   public getAccounts(): Promise<Account[]> {
     return this.createQueryBuilder()
-      .orderBy('create_at', 'DESC')
+      .orderBy('account_num', 'DESC')
       .getMany()
+  }
+
+  public getMeoguHold(): Promise<Account[]> {
+    return this.createQueryBuilder()
+      .select('SUM(pay)', 'sum')
+      .where('account_num like :accountNum', { accountNum: `${719}%` })
+      .getRawOne();
   }
 }

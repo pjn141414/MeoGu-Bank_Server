@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Account from 'src/models/account';
-import UserRepository from '../auth/repositories/user.repository';
-import AccountRepository from './repositories/acount.repository';
+import UserRepository from '../user/repositories/user.repository';
+import AccountRepository from './repositories/account.repository';
 
 @Injectable()
 export class AccountService {
@@ -22,9 +22,11 @@ export class AccountService {
    */
   // async getAccount(): Promise<Account | undefined> { }
 
+
   /**
    * @description 계좌 개설
    */
+
 
   /**
   * @description 계좌 추가
@@ -33,12 +35,16 @@ export class AccountService {
   /**
   * @description 자은행 총 보유 금액 조회
   */
+  async getMeoguHold(): Promise<Account[]> {
+    return await this.accountRepository.getMeoguHold();
+  }
 
   /**
    * @description 자은행 고객별 총 보유 금액 조회
    */
 
+
   /**
-   * @description 자은행 유저 검색
-   */
+  * @description 타은행 본인 계좌 보유 금액 가져오기
+  */
 }
