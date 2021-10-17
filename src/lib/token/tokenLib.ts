@@ -2,9 +2,9 @@ import * as jwt from 'jsonwebtoken';
 import { SignOptions } from 'jsonwebtoken';
 import { JWT_SECRET } from 'src/config/config';
 
-export const generateToken = (id: string): string => {
+export const generateToken = (phone: string): string => {
   const payload = {
-    id,
+    phone,
   };
 
   const options: SignOptions = {
