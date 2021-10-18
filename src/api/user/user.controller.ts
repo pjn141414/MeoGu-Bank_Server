@@ -1,16 +1,25 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, UseGuards } from '@nestjs/common';
 import { Token } from 'src/lib/token/tokenDeco';
 import AuthGuard from 'src/middleware/auth.middleware';
 import User from 'src/models/User';
+import CheckUserDto from './dto/checkUserDto';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(
-
+    private readonly userService: UserService,
   ) { }
 
+  @Get('/check')
+  @HttpCode(200)
   @UseGuards(new AuthGuard())
-  async test(@Token() user: User) {
+  async checkUser(@Token() user: User, @Body() checkUserDto: CheckUserDto) {
+    await this.userService.checkUser(user, checkUserDto);
 
+    return {
+      status: 200,
+      message: '본인 인증 성공',
+    };
   }
 }
