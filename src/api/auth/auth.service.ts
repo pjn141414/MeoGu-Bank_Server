@@ -133,7 +133,7 @@ export class AuthService {
       throw new NotFoundException('아이디 또는 비밀번호가 틀렸습니다.');
     }
 
-    const token = generateToken(user.id);
+    const token = generateToken(user.phone);
     const easyPwUser = await this.easyPasswordRepository.getUserById(id);
     if (easyPwUser === undefined) {
       throw new NotFoundException('간편 비밀번호 설정이 되어 있지 않습니다.');
@@ -150,7 +150,7 @@ export class AuthService {
    * @description 간편 비밀번호 등록
    * @todo 간편 비밀번호 암호화
    */
-  async easyLoginSignUp(easyLoginSignUpDto: EasyLoginSignUpDto): Promise<EasyPassword | undefined> {
+  async easyLoginSignUp(easyLoginSignUpDto: EasyLoginSignUpDto): Promise<EasyPassword> {
     const { userId, easyPassword }: { userId: string, easyPassword: string } = easyLoginSignUpDto;
 
     const user: User | undefined = await this.userRepository.getUserById(userId);
@@ -199,7 +199,7 @@ export class AuthService {
       throw new NotFoundException('첫 로그인이 일반 로그인이 아니거나 틀린 간편 비밀번호 입니다.');
     }
 
-    const token = generateToken(easyPwIdx.userId);
+    const token = generateToken(user.phone);
 
     return {
       token,

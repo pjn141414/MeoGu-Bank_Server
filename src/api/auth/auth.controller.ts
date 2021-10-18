@@ -46,7 +46,6 @@ export class AuthController {
     try {
       const user = await this.authService.signIn(signInDto);
 
-
       return {
         status: 200,
         message: '로그인 성공',
