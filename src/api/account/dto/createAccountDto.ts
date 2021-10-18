@@ -6,4 +6,8 @@ export default class CreateAccountDto {
   @IsNotEmpty()
   @IsString()
   name!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password!: string;
 }

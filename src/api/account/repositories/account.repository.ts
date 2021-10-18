@@ -5,8 +5,14 @@ import { EntityRepository, Repository } from "typeorm";
 export default class AccountRepository extends Repository<Account> {
   public getAccounts(): Promise<Account[]> {
     return this.createQueryBuilder()
-      .orderBy('account_num', 'DESC')
+      .orderBy('fk_user_id', 'DESC')
       .getMany()
+  }
+
+  public getAccount(accountNum: string): Promise<Account | undefined> {
+    return this.createQueryBuilder()
+      .where('account_num = :accountNum', { accountNum })
+      .getOne();
   }
 
   public getMeoguHold(): Promise<Account[]> {
