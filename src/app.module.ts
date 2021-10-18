@@ -9,9 +9,10 @@ import { AuthModule } from './api/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'src/config/ormConfig';
 import { AccountModule } from './api/account/account.module';
+import { UserModule } from './api/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config), AuthModule, AccountModule],
+  imports: [TypeOrmModule.forRoot(config), AuthModule, AccountModule, UserModule],
   controllers: [AppController, UploadController],
   providers: [AppService, {
     provide: APP_FILTER,
