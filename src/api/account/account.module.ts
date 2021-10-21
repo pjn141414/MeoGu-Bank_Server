@@ -1,4 +1,3 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Account from 'src/models/account';
@@ -9,7 +8,7 @@ import { AccountService } from './account.service';
 import AccountRepository from './repositories/account.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserRepository, Account, AccountRepository, HttpModule])],
+  imports: [TypeOrmModule.forFeature([User, UserRepository, Account, AccountRepository])],
   controllers: [AccountController],
   providers: [AccountService]
 })
