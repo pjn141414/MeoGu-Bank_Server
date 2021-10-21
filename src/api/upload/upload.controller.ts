@@ -1,9 +1,11 @@
 import { Controller, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { multerOptions } from 'src/lib/upload/multerOption';
 import AuthGuard from 'src/middleware/auth.middleware';
 import { UploadService } from './upload.service';
 
+@ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
   constructor(
