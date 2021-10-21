@@ -1,8 +1,11 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import uuid from 'src/lib/uuid/uuid';
 import Account from 'src/models/account';
 import User from 'src/models/User';
 import UserRepository from '../user/repositories/user.repository';
+import AddAccountDto from './dto/addAccountDto';
 import CreateAccountDto from './dto/createAccountDto';
 import AccountRepository from './repositories/account.repository';
 
@@ -11,6 +14,8 @@ export class AccountService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly accountRepository: AccountRepository,
+    @InjectRepository(Account)
+    private httpService: HttpService,
   ) { }
 
   /**
@@ -18,19 +23,64 @@ export class AccountService {
    */
   async getAccounts(): Promise<Account[]> {
     return await this.accountRepository.getAccounts();
+
   }
 
   /**
-   * @description 특정 계좌 조회
+   * @description 유저 전화번호로 해당 유저의 자은행 계좌 조회
    */
-  async getAccount(accountNum: string): Promise<Account | undefined> {
-    const account: Account = await this.accountRepository.getAccount(accountNum);
+  async getAccountsByUserPhone(phone: string): Promise<Account[]> {
+    const userPhone: User | undefined = await this.userRepository.getUserByPhone(phone);
+    if (userPhone === undefined) {
+      throw new NotFoundException('해당 전화번호를 가진 유저가 없습니다.');
+    }
+
+    console.log(userPhone);
+    console.log(userPhone.id);
+
+    const userId: string = userPhone.id;
+
+    console.log(userId);
+
+    const account: Account[] = await this.accountRepository.getAccountsByUserId(userId);
+
+    return account;
+  }
+
+  /**
+   * @description 계좌번호로 특정 계좌 조회
+   */
+  async getAccountByAccountNum(accountNum: string): Promise<Account | undefined> {
+    const account: Account | undefined = await this.accountRepository.getAccountByAccountNum(accountNum);
     if (account === undefined) {
       throw new NotFoundException('없는 계좌입니다.');
     }
 
     return account;
   }
+
+  /**
+   * @description 타은행 계좌 조회
+   */
+  async getAccountInOther(user: User, addAccountDto: AddAccountDto): Promise<Account> {
+    const { password }: { password: string } = addAccountDto;
+
+    const userPhone: User | undefined = await this.userRepository.getUserByPhone(user.phone);
+
+    const regex = /^[0-9]{4}$/;
+    if (!regex.test(password)) {
+      throw new BadRequestException('계좌 비밀번호는 숫자 4자리입니다.');
+    }
+
+    this.httpService
+
+
+    return;
+  }
+
+  /**
+   * @description 타은행 계좌 추가
+   */
 
   /**
    * @description 계좌 개설
@@ -46,7 +96,7 @@ export class AccountService {
       accountNum = uuid();
 
       // 생성한 uuid와 겹치는 계좌 번호가 있는지 확인
-      const existAccount = await this.accountRepository.getAccount(accountNum);
+      const existAccount = await this.accountRepository.getAccountByAccountNum(accountNum);
       if (existAccount !== undefined) {
         continue; // 존재하면 다시 처음으로
       }
@@ -75,6 +125,9 @@ export class AccountService {
   /**
   * @description 계좌 추가
   */
+  // async addAccount(): Promise<Account> {
+
+  // }
 
   /**
   * @description 자은행 총 보유 금액 조회
