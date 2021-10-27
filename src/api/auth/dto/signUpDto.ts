@@ -32,4 +32,8 @@ export default class SignUpDto {
   @Length(7)
   @IsString()
   birth!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  profileImage!: string;
 }
