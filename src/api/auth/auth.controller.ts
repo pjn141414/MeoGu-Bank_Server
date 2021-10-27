@@ -5,6 +5,7 @@ import SignInDto from './dto/signInDto';
 import EasyLoginSignUpDto from './dto/easyLoginSignUpDto';
 import EasyLoginDto from './dto/easyLoginDto';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import User from 'src/models/User';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -17,6 +18,7 @@ export class AuthController {
   @Get('/signup/check')
   @HttpCode(200)
   @ApiOperation({ summary: '아이디 중복 체크 API', description: '유저 아이디 중복 체크' })
+  @ApiOkResponse({ description: '아이디 중복 체크 성공', type: User })
   async existCheckId(@Query('id') id: string) {
     const user: boolean = await this.authService.existIdCheck(id);
 
