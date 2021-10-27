@@ -1,7 +1,6 @@
 import Account from "src/models/account";
 import { AccountEnum } from "src/lib/enum/account";
 import { EntityRepository, Repository } from "typeorm";
-import User from "src/models/User";
 
 @EntityRepository(Account)
 export default class AccountRepository extends Repository<Account> {
@@ -28,6 +27,14 @@ export default class AccountRepository extends Repository<Account> {
     return this.createQueryBuilder()
       .select('SUM(pay)', 'sum')
       .where('account_num like :accountNum', { accountNum: `${AccountEnum.JN}%` })
+      .getRawOne();
+  }
+
+  public getMeoguHoldByUserId(userId: string): Promise<Account[]> {
+    return this.createQueryBuilder()
+      .select('SUM(pay)', 'sum')
+      .where('fk_user_id = :userId', { userId })
+      .andWhere('account_num like :accountNum', { accountNum: `${AccountEnum.JN}%` })
       .getRawOne();
   }
 }
