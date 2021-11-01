@@ -1,6 +1,5 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import axios from 'axios';
-import { DealType } from 'src/lib/enum/dealType';
 import { EndPoints } from 'src/lib/enum/endPoints';
 import uuid from 'src/lib/uuid/uuid';
 import Account from 'src/models/account';
@@ -165,11 +164,4 @@ export class AccountService {
 
     return account;
   }
-
-
-  /**
-  * @description 타은행 본인 계좌 보유 금액 가져오기
-  */
-
-
 }
