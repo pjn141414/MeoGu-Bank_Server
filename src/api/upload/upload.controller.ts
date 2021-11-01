@@ -12,7 +12,7 @@ export class UploadController {
     private readonly uploadService: UploadService,
   ) { }
 
-  @UseInterceptors(FilesInterceptor('images', null, multerOptions))
+  @UseInterceptors(FilesInterceptor('images', 1, multerOptions))
   // FilesInterceptor 첫번째 매개변수: formData의 key 값,
   // 두번째 매개변수: 파일 최대 갯수,
   // 세번째 매개변수: 파일 설정 (위에서 작성했던 multer 옵션들)
