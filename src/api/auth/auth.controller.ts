@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import SignUpDto from './dto/signUpDto';
 import SignInDto from './dto/signInDto';
@@ -24,15 +24,14 @@ export class AuthController {
 
     return {
       status: 200,
-      message: '아이디 중복 체크 성공',
-      data: {
-        user,
-      }
+      message: '아이디 중복 체크 성공'
     };
   }
 
   @Post('/signup')
   @HttpCode(200)
+  @ApiOperation({ summary: '일반 회원가입 API', description: '일반 회원가입' })
+  @ApiOkResponse({ description: '일반 회원가입 성공', type: User })
   async signUp(@Body() signUpDto: SignUpDto) {
     try {
       await this.authService.signUp(signUpDto);
@@ -48,6 +47,8 @@ export class AuthController {
 
   @Post('/signin')
   @HttpCode(200)
+  @ApiOperation({ summary: '일반 로그인 API', description: '일반 로그인' })
+  @ApiOkResponse({ description: '일반 로그인 성공', type: SignInDto })
   async signIn(@Body() signInDto: SignInDto) {
     try {
       const user = await this.authService.signIn(signInDto);
@@ -66,6 +67,8 @@ export class AuthController {
 
   @Post('/signup/easy')
   @HttpCode(200)
+  @ApiOperation({ summary: '간편 회원가입 API', description: '간편 회원가입' })
+  @ApiOkResponse({ description: '간편 회원가입 성공', type: User })
   async easyLoginSignUp(@Body() easyLoginSignUpDto: EasyLoginSignUpDto) {
     await this.authService.easyLoginSignUp(easyLoginSignUpDto);
 
@@ -77,6 +80,8 @@ export class AuthController {
 
   @Post('/signin/easy')
   @HttpCode(200)
+  @ApiOperation({ summary: '간편 로그인 API', description: '간편 로그인' })
+  @ApiOkResponse({ description: '간편 로그인 성공', type: User })
   async easyLogin(@Body() easyLoginDto: EasyLoginDto) {
     const easyLogin = await this.authService.easyLogin(easyLoginDto);
 
