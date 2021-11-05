@@ -1,5 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import axios from 'axios';
+import { IAddAccount } from 'src/interfaces/account/addAccount.interface';
+import { ICreateAccount } from 'src/interfaces/account/createAccount.interface';
+import { IGetAccount } from 'src/interfaces/account/getAccount.interface';
 import { EndPoints } from 'src/lib/enum/endPoints';
 import uuid from 'src/lib/uuid/uuid';
 import Account from 'src/models/account';
@@ -21,19 +24,21 @@ export class AccountService {
    */
   async getAccounts(): Promise<Account[]> {
     return await this.accountRepository.getAccounts();
-
   }
 
   /**
    * @description 계좌번호로 특정 자은행 계좌 조회
    */
-  async getAccountByAccountNum(accountNum: string): Promise<Account | undefined> {
+  async getAccountByAccountNum(accountNum: string): Promise<IGetAccount> {
     const account: Account | undefined = await this.accountRepository.getAccountByAccountNum(accountNum);
     if (account === undefined) {
       throw new NotFoundException('없는 계좌입니다.');
     }
 
-    return account;
+    return {
+      accountNum: account.accountNum,
+      name: account.name,
+    };
   }
 
   /**
@@ -52,23 +57,47 @@ export class AccountService {
   }
 
   /**
-   * @description 유저 전화번호로 해당 유저의 타은행 계좌 조회
+   * @description 외부 서버 axios
    */
-  async getOtherAccountsByUserPhone(user: User): Promise<any> {
-    const userPhone: User | undefined = await this.userRepository.getUserByPhone(user.phone);
-    if (userPhone.phone === undefined) {
-      throw new NotFoundException('해당 전화번호를 가진 유저가 없습니다.');
-    }
 
-    const account = await axios.get(`${EndPoints.SC}/communication/${userPhone.phone}`);
+  async Kakao_SC(userPhone: string): Promise<any> {
+    const account = await axios.get(`${EndPoints.SC}/communication/${userPhone}`);
+
+    return account.data;
+  }
+
+  async Toss_SD(userPhone: string): Promise<any> {
+    let phone = Number(userPhone);
+    const account = await axios.get(`${EndPoints.SD}/account/0${phone}`);
+
+    return account.data;
+  }
+
+  async KBank_JW(userPhone: string): Promise<any> {
+    const account = await axios.get(`${EndPoints.JW}/api/open/accounts/${userPhone}`);
 
     return account.data;
   }
 
   /**
+   * @description 유저 전화번호로 해당 유저의 타은행 계좌 조회
+   */
+  async getOtherAccountsByUserPhone(user: User): Promise<any> {
+    const userPhone: User | undefined = await this.userRepository.getUserByPhone(user.phone);
+    const phone = userPhone.phone;
+    if (phone === undefined) {
+      throw new NotFoundException('해당 전화번호를 가진 유저가 없습니다.');
+    }
+
+    const account = await axios.all([this.Kakao_SC(phone), this.Toss_SD(phone), this.KBank_JW(phone)]);
+
+    return account;
+  }
+
+  /**
    * @description 계좌 개설
    */
-  async createAccount(user: User, createAccountDto: CreateAccountDto): Promise<string> {
+  async createAccount(user: User, createAccountDto: CreateAccountDto): Promise<ICreateAccount> {
     const { name, password }: { name: string, password: string } = createAccountDto;
 
     const userPhone: User | undefined = await this.userRepository.getUserByPhone(user.phone);
@@ -102,13 +131,15 @@ export class AccountService {
 
     await this.accountRepository.save(account);
 
-    return account.accountNum;
+    return {
+      accountNum: account.accountNum,
+    };
   }
 
   /**
   * @description 계좌 추가
   */
-  async addAccount(user: User, addAccountDto: AddAccountDto): Promise<string> {
+  async addAccount(user: User, addAccountDto: AddAccountDto): Promise<IAddAccount> {
     const { accountNum, name, password, pay }:
       { accountNum: string, name: string, password: string, pay: number } = addAccountDto;
 
@@ -141,13 +172,15 @@ export class AccountService {
 
     await this.accountRepository.save(account);
 
-    return account.accountNum;
+    return {
+      accountNum: account.accountNum,
+    };
   }
 
   /**
   * @description 자은행 총 보유 금액 조회
   */
-  async getMeoguHold(): Promise<Account[]> {
+  async getMeoguHold(): Promise<Account> {
     return await this.accountRepository.getMeoguHold();
   }
 

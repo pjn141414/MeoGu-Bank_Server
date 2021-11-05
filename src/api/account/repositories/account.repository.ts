@@ -23,7 +23,7 @@ export default class AccountRepository extends Repository<Account> {
       .getOne();
   }
 
-  public getMeoguHold(): Promise<Account[]> {
+  public getMeoguHold(): Promise<Account> {
     return this.createQueryBuilder()
       .select('SUM(pay)', 'sum')
       .where('account_num like :accountNum', { accountNum: `${AccountEnum.JN}%` })
