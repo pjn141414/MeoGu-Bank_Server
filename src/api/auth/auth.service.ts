@@ -9,8 +9,8 @@ import EasyPasswordRepository from './repositories/easyPassword.repository';
 import UserRepository from '../user/repositories/user.repository';
 import { v4 as uuidv4 } from 'uuid';
 import SignInDto from './dto/signInDto';
-import { ILogin } from 'src/interfaces/login.interface';
-import IEasyLogin from 'src/interfaces/easyLogin.interface';
+import { ILogin } from 'src/interfaces/auth/login.interface';
+import IEasyLogin from 'src/interfaces/auth/easyLogin.interface';
 
 @Injectable()
 export class AuthService {
@@ -118,7 +118,6 @@ export class AuthService {
 
     await this.checkPwForm(password);
 
-
     await this.userRepository.create(signUpDto);
     await this.userRepository.save(signUpDto);
   }
@@ -203,7 +202,6 @@ export class AuthService {
 
     return {
       token,
-      easyLogin,
     };
   }
 }
