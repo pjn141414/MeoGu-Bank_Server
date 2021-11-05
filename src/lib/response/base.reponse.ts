@@ -1,13 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export default class BaseReponse<T> {
-  @ApiProperty()
+  @ApiProperty({ default: 200 })
   status: number;
 
   @ApiProperty()
   message: string;
 
-  @ApiProperty()
   data?: T;
 
   constructor(
