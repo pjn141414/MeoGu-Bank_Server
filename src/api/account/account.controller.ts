@@ -3,12 +3,14 @@ import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation
 import { IAddAccount } from 'src/interfaces/account/addAccount.interface';
 import { ICreateAccount } from 'src/interfaces/account/createAccount.interface';
 import { IGetAccount } from 'src/interfaces/account/getAccount.interface';
+import BaseReponse from 'src/lib/response/base.reponse';
 import { Token } from 'src/lib/token/tokenDeco';
 import AuthGuard from 'src/middleware/auth.middleware';
 import Account from 'src/models/account';
 import User from 'src/models/User';
 import { AccountService } from './account.service';
 import AddAccountDto from './dto/addAccountDto';
+import CheckAccountNumAndPwDto from './dto/checkAccountNumAndPwDto';
 import CreateAccountDto from './dto/createAccountDto';
 import CreateAccountResponse, { AddAccountReponse, GetAccountByAccountNumResponse, GetMeoguHoldResponse, AccountArrayResponse } from './responses/account.response';
 
@@ -38,6 +40,18 @@ export class AccountController {
     const account = await this.accountService.getOtherAccountsByUserPhone(user);
 
     return new AccountArrayResponse(200, '유저 전화번호로 해당 유저의 타은행 계좌 조회 성공', account);
+  }
+
+  @Get('find/account')
+  @HttpCode(200)
+  @ApiOperation({ summary: '계좌번호로 특정 머구은행 계좌번호, 비밀번호 조회 API', description: '계좌번호로 특정 머구은행 계좌번호, 비밀번호 조회' })
+  @ApiOkResponse({ description: '계좌번호로 특정 머구은행 계좌번호, 비밀번호 조회 성공', type: BaseReponse })
+  @ApiBadRequestResponse({ description: '올바르지 않은 계좌 비밀번호입니다.' })
+  @ApiNotFoundResponse({ description: '없는 계좌입니다.' })
+  async checkAccountNumAndPw(@Body() checkAccountNumAndPwDto: CheckAccountNumAndPwDto) {
+    const account: boolean = await this.accountService.checkAccountNumAndPw(checkAccountNumAndPwDto);
+
+    return new BaseReponse(200, '계좌번호로 특정 머구은행 계좌번호, 비밀번호 조회 성공', account);
   }
 
   @Get('find/account/:account')

@@ -1,15 +1,18 @@
-import { BadRequestException, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import axios from 'axios';
 import { IAddAccount } from 'src/interfaces/account/addAccount.interface';
 import { ICreateAccount } from 'src/interfaces/account/createAccount.interface';
 import { IGetAccount } from 'src/interfaces/account/getAccount.interface';
+import { AccountEnum } from 'src/lib/enum/account';
 import { EndPoints } from 'src/lib/enum/endPoints';
 import uuid from 'src/lib/uuid/uuid';
 import Account from 'src/models/account';
 import User from 'src/models/User';
 import UserRepository from '../user/repositories/user.repository';
 import AddAccountDto from './dto/addAccountDto';
+import CheckAccountNumAndPwDto from './dto/checkAccountNumAndPwDto';
 import CreateAccountDto from './dto/createAccountDto';
+import ReceivePayInOtherDto from './dto/receivePayInOtherDto';
 import AccountRepository from './repositories/account.repository';
 
 @Injectable()
@@ -42,6 +45,24 @@ export class AccountService {
   }
 
   /**
+   * @description 계좌번호로 특정 자은행 계좌, 비밀번호 확인
+   */
+  async checkAccountNumAndPw(checkAccountNumAndPwDto: CheckAccountNumAndPwDto): Promise<boolean> {
+    const { accountNum, accountPw }: { accountNum: string, accountPw: string } = checkAccountNumAndPwDto;
+    const account: Account | undefined = await this.accountRepository.getAccountByAccountNum(accountNum);
+    if (account === undefined) {
+      throw new NotFoundException('없는 계좌입니다.');
+    }
+
+    const password: string | undefined = account.password;
+    if (accountPw !== password) {
+      throw new BadRequestException('올바르지 않은 계좌 비밀번호입니다.');
+    }
+
+    return true;
+  }
+
+  /**
    * @description 유저 전화번호로 해당 유저의 자은행 계좌 조회
    */
   async getAccountsByUserPhone(phone: string): Promise<Account[]> {
@@ -57,9 +78,8 @@ export class AccountService {
   }
 
   /**
-   * @description 외부 서버 axios
+   * @description 전화번호로 계좌 조회 API 외부 서버 axios
    */
-
   async Kakao_SC(userPhone: string): Promise<any> {
     const account = await axios.get(`${EndPoints.SC}/communication/${userPhone}`);
 
@@ -175,6 +195,78 @@ export class AccountService {
     return {
       accountNum: account.accountNum,
     };
+  }
+
+  /**
+   * @description 타은행 계좌번호로 계좌 조회 API 외부 서버 axios 
+   */
+  async R_Kakao_SC(accountNum: string): Promise<any> {
+    const account: any = await axios.get(`${EndPoints.SC}/communication/check/accountNum/${accountNum}`);
+
+    return account.data;
+  }
+
+  /**
+   * @description 추가된 계좌 내에서 다른 내 계좌로 보유 금액 가져오기
+   */
+  async receivePayToOther(receivePayInOtherDto: ReceivePayInOtherDto): Promise<any> {
+    const { sendAccountNum, receiveAccountNum, receiveAccountPw, transactionPay }:
+      { sendAccountNum: string, receiveAccountNum: string, receiveAccountPw: string, transactionPay: number } = receivePayInOtherDto;
+
+    const sendAccount: Account = await this.accountRepository.getAccountByAccountNum(sendAccountNum);
+    if (sendAccount === undefined) {
+      throw new NotFoundException('추가 되어 있지 않은 계좌입니다.');
+    }
+
+    const regex = /^[0-9]{4}$/;
+    if (!regex.test(receiveAccountPw)) {
+      throw new BadRequestException('계좌 비밀번호는 숫자 4자리만 가능합니다.');
+    }
+
+    const receiveAccount: Account = await this.accountRepository.getAccountByAccountNum(receiveAccountNum);
+
+    const bankCode: string = receiveAccountNum.slice(0, 3)
+    switch (bankCode) {
+      case AccountEnum.JN:
+        // 719 일 경우에만 적용
+        const checkPassword = sendAccount.password;
+        if (receiveAccountPw !== checkPassword) {
+          throw new BadRequestException('틀린 계좌 비밀번호입니다.');
+        }
+
+        break;
+      case AccountEnum.SC:
+        break;
+
+      case AccountEnum.SD:
+        break;
+
+      case AccountEnum.JW:
+        break;
+    }
+
+    switch (bankCode) {
+      case AccountEnum.JN:
+        const pay: number = sendAccount.pay;
+        if (transactionPay > pay || pay <= 0) {
+          throw new ConflictException('');
+        }
+
+      case AccountEnum.SC:
+        const SC_account: any = this.R_Kakao_SC(receiveAccountNum);
+        if (transactionPay > SC_account.pay || SC_account.pay <= 0) {
+          throw new ConflictException('타계좌 보유 금액보다 가져오려는 금액이 더 큽니다.')
+        }
+
+        break;
+
+      case AccountEnum.SD:
+        break;
+
+      case AccountEnum.JW:
+        break;
+    }
+    return;
   }
 
   /**

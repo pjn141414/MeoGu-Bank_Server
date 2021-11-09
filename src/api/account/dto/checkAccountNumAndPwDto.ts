@@ -3,24 +3,14 @@ import { IsNotEmpty, IsString } from "class-validator";
 import { Entity } from "typeorm";
 
 @Entity('account')
-export default class ReceivePayToOtherDto {
+export default class CheckAccountNumAndPwDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  sendAccountNum!: string;
+  accountNum!: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  receiveAccountNum!: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  receiveAccountPw!: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  transactionPay!: number;
+  accountPw!: string;
 }
