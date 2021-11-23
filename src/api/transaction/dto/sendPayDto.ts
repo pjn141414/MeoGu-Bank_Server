@@ -16,8 +16,4 @@ export default class SendPayDto {
   @IsNotEmpty()
   @IsNumber()
   pay!: number;
-
-  @IsOptional()
-  @IsString()
-  type?: string;
 }
