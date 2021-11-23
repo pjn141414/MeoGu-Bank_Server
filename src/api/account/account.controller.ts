@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IAddAccount } from 'src/interfaces/account/addAccount.interface';
 import { ICreateAccount } from 'src/interfaces/account/createAccount.interface';
@@ -12,6 +12,7 @@ import { AccountService } from './account.service';
 import AddAccountDto from './dto/addAccountDto';
 import CheckAccountNumAndPwDto from './dto/checkAccountNumAndPwDto';
 import CreateAccountDto from './dto/createAccountDto';
+import ReceivePayToOtherDto from './dto/receivePayInOtherDto';
 import CreateAccountResponse, { AddAccountReponse, GetAccountByAccountNumResponse, GetMeoguHoldResponse, AccountArrayResponse } from './responses/account.response';
 
 @ApiTags('Account')
@@ -48,7 +49,7 @@ export class AccountController {
   @ApiOkResponse({ description: '계좌번호로 특정 머구은행 계좌번호, 비밀번호 조회 성공', type: BaseReponse })
   @ApiBadRequestResponse({ description: '올바르지 않은 계좌 비밀번호입니다.' })
   @ApiNotFoundResponse({ description: '없는 계좌입니다.' })
-  async checkAccountNumAndPw(@Body() checkAccountNumAndPwDto: CheckAccountNumAndPwDto) {
+  async checkAccountNumAndPw(@Param() checkAccountNumAndPwDto: CheckAccountNumAndPwDto) {
     const account: boolean = await this.accountService.checkAccountNumAndPw(checkAccountNumAndPwDto);
 
     return new BaseReponse(200, '계좌번호로 특정 머구은행 계좌번호, 비밀번호 조회 성공', account);
@@ -100,6 +101,18 @@ export class AccountController {
     const account: IAddAccount = await this.accountService.addAccount(user, addAccountDto);
 
     return new AddAccountReponse(200, '계좌 추가 성공', account);
+  }
+
+  @Put('/take')
+  @HttpCode(200)
+  @ApiOperation({ summary: '추가된 계좌 내에서 다른 내 계좌로 보유 금액 가져오기 API' })
+  @ApiOkResponse({ description: '계좌 추가 성공', type: AddAccountReponse })
+  @ApiBadRequestResponse({ description: '올바르지 않은 계좌번호입니다.' })
+  @ApiNotFoundResponse({ description: '해당 전화번호를 가진 유저가 없습니다.' })
+  async receivePayToOther(@Body() receivePayToOther: ReceivePayToOtherDto) {
+    const account: number = await this.accountService.receivePayToOther(receivePayToOther);
+
+    return new BaseReponse(200, '추가된 계좌 내에서 다른 내 계좌로 보유 금액 가져오기 성공', account);
   }
 
   @Get('/hold/bank')

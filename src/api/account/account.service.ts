@@ -5,6 +5,7 @@ import { ICreateAccount } from 'src/interfaces/account/createAccount.interface';
 import { IGetAccount } from 'src/interfaces/account/getAccount.interface';
 import { AccountEnum } from 'src/lib/enum/account';
 import { EndPoints } from 'src/lib/enum/endPoints';
+import hashPassword from 'src/lib/util/hashPassword';
 import uuid from 'src/lib/uuid/uuid';
 import Account from 'src/models/account';
 import User from 'src/models/User';
@@ -207,9 +208,24 @@ export class AccountService {
   }
 
   /**
+   * @description 타은행 계좌번호, 비밀번호 확인 API 외부 서버 axios 
+   */
+  async Check_Kakao_SC(accountNum: string, accountPw: string): Promise<any> {
+    const account: any = await axios.get(`${EndPoints.SC}/communication/check/accountPw/`,
+      {
+        params: {
+          "accountNum": accountNum,
+          "password": accountPw,
+        }
+      });
+
+    return account.data;
+  }
+
+  /**
    * @description 추가된 계좌 내에서 다른 내 계좌로 보유 금액 가져오기
    */
-  async receivePayToOther(receivePayInOtherDto: ReceivePayInOtherDto): Promise<any> {
+  async receivePayToOther(receivePayInOtherDto: ReceivePayInOtherDto): Promise<number> {
     const { sendAccountNum, receiveAccountNum, receiveAccountPw, transactionPay }:
       { sendAccountNum: string, receiveAccountNum: string, receiveAccountPw: string, transactionPay: number } = receivePayInOtherDto;
 
@@ -218,45 +234,81 @@ export class AccountService {
       throw new NotFoundException('추가 되어 있지 않은 계좌입니다.');
     }
 
+    const receiveAccount: Account = await this.accountRepository.getAccountByAccountNum(receiveAccountNum);
+    if (receiveAccount === undefined) {
+      throw new NotFoundException('없는 계좌입니다.');
+    }
+
     const regex = /^[0-9]{4}$/;
     if (!regex.test(receiveAccountPw)) {
       throw new BadRequestException('계좌 비밀번호는 숫자 4자리만 가능합니다.');
     }
 
-    const receiveAccount: Account = await this.accountRepository.getAccountByAccountNum(receiveAccountNum);
+    const checkPassword: string = receiveAccount.password;
+    const hashPw = hashPassword(receiveAccountPw);
 
+    // @todo pw 부분과 pay 부분의 switch문 합치기
     const bankCode: string = receiveAccountNum.slice(0, 3)
     switch (bankCode) {
       case AccountEnum.JN:
-        // 719 일 경우에만 적용
-        const checkPassword = sendAccount.password;
         if (receiveAccountPw !== checkPassword) {
           throw new BadRequestException('틀린 계좌 비밀번호입니다.');
         }
 
+
+
         break;
       case AccountEnum.SC:
+        if (receiveAccountPw !== checkPassword) {
+          throw new BadRequestException('틀린 계좌 비밀번호입니다.');
+        }
+
+        // this.Check_Kakao_SC(receiveAccountNum, receiveAccountPw);
         break;
 
       case AccountEnum.SD:
+        if (hashPw !== checkPassword) {
+          throw new BadRequestException('틀린 계좌 비밀번호입니다.');
+        }
+
         break;
 
       case AccountEnum.JW:
+        if (hashPw !== checkPassword) {
+          throw new BadRequestException('틀린 계좌 비밀번호입니다.');
+        }
+
         break;
+
+      default:
+        throw new NotFoundException('없는 은행입니다.');
     }
 
     switch (bankCode) {
       case AccountEnum.JN:
-        const pay: number = sendAccount.pay;
+        let pay: number = sendAccount.pay;
         if (transactionPay > pay || pay <= 0) {
-          throw new ConflictException('');
+          throw new ConflictException('타계좌 보유 금액보다 가져오려는 금액이 더 큽니다.');
         }
+
+        const afterSend = pay - transactionPay;
+        pay = afterSend;
+
+
+
+        break;
 
       case AccountEnum.SC:
         const SC_account: any = this.R_Kakao_SC(receiveAccountNum);
-        if (transactionPay > SC_account.pay || SC_account.pay <= 0) {
-          throw new ConflictException('타계좌 보유 금액보다 가져오려는 금액이 더 큽니다.')
+        let SC_pay: number = SC_account.pay;
+        if (transactionPay > SC_pay || SC_pay <= 0) {
+          throw new ConflictException('타계좌 보유 금액보다 가져오려는 금액이 더 큽니다.');
         }
+
+        SC_pay -= transactionPay;
+        axios.put(SC_account, SC_pay);
+
+        await this.accountRepository.save({ pay: SC_pay });
 
         break;
 
@@ -266,6 +318,7 @@ export class AccountService {
       case AccountEnum.JW:
         break;
     }
+
     return;
   }
 
