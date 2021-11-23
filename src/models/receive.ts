@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
 import Account from "./account";
 
 @Entity('receive')
@@ -9,11 +9,14 @@ export default class Receive {
   @Column({ name: 'sender_id' })
   senderId!: string;
 
+  @Column({ name: 'receiver_id' })
+  receiverId!: string;
+
   @RelationId((receive: Receive) => receive.account)
   accountNum!: string;
 
   @JoinColumn({ name: 'fk_account_num' })
-  @ManyToMany(type => Account, {
+  @ManyToOne(type => Account, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

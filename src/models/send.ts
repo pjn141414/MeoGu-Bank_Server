@@ -1,10 +1,13 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
 import Account from "./account";
 
 @Entity('send')
 export default class Send {
   @PrimaryGeneratedColumn({ name: 'idx' })
   idx!: number;
+
+  @Column({ name: 'sender_id' })
+  senderId!: string;
 
   @Column({ name: 'receiver_id' })
   receiverId!: string;
@@ -13,7 +16,7 @@ export default class Send {
   accountNum!: string;
 
   @JoinColumn({ name: 'fk_account_num' })
-  @ManyToMany(type => Account, {
+  @ManyToOne(type => Account, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
